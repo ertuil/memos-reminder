@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -26,6 +27,7 @@ type SMTP struct {
 	Password string `yaml:"password"`
 	TLS      bool   `yaml:"tls"`
 	STARTTLS bool   `yaml:"starttls"`
+	Insecure bool   `yaml:"insecure"`
 }
 
 type USER struct {
@@ -43,5 +45,7 @@ func LoadConfig(filename string) (err error) {
 	if err != nil {
 		return
 	}
+
+	slog.Info("Load config", "config", Config, "file", filename)
 	return nil
 }

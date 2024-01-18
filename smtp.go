@@ -31,7 +31,7 @@ func SendSMTP(UID int, MID int, ts time.Time, Content string) (err error) {
 	var conn net.Conn
 	address := net.JoinHostPort(Config.Smtp.Host, Config.Smtp.Port)
 	if Config.Smtp.TLS {
-		conn, err = tls.Dial("tcp", address, &tls.Config{ServerName: Config.Smtp.Host})
+		conn, err = tls.Dial("tcp", address, &tls.Config{ServerName: Config.Smtp.Host, InsecureSkipVerify: Config.Smtp.Insecure})
 	} else {
 		conn, err = net.Dial("tcp", address)
 	}
@@ -49,7 +49,7 @@ func SendSMTP(UID int, MID int, ts time.Time, Content string) (err error) {
 	defer client.Close()
 
 	if Config.Smtp.STARTTLS {
-		client.StartTLS(&tls.Config{ServerName: Config.Smtp.Host})
+		client.StartTLS(&tls.Config{ServerName: Config.Smtp.Host, InsecureSkipVerify: Config.Smtp.Insecure})
 	}
 
 	// Authentication
