@@ -1,0 +1,5 @@
+example
+.vscode
+!example/.gitkeep
+!example/config.yaml
+data

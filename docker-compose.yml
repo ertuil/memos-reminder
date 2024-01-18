@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  memos-reminder:
+    image: memos-reminder:latest
+    command: /app/memos-reminder --verbose --config /app/data/config.yaml --database /app/data/database.db
+    ports:
+      - 8880:8880
+    volumes:
+      - ./data:/app/data
+      - /etc/localtime:/etc/localtime:ro
