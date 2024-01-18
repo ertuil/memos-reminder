@@ -31,6 +31,11 @@ type WebhookT struct {
     URL string `json:"url"`
 }
 
+type WebhookResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 func HTTPServe(ctx context.Context) {
 
 	srv := http.Server{
@@ -57,9 +62,17 @@ func HTTPServe(ctx context.Context) {
 func HandleWebhook(w http.ResponseWriter, r *http.Request) {
 	slog.Info("Got webhook", "method", r.Method, "remote", r.RemoteAddr, "url", r.URL, "type", r.Header.Get("Content-Type"))
 
+	var resp = WebhookResponse{
+		Code: 500,
+		Message: "error",
+	}
+
+	resp_b, _ := json.Marshal(resp)
+
 	if r.Method != "POST" {
 		slog.Error("Invalid method", "method", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write(resp_b)
 		return
 	}
 	
@@ -67,6 +80,7 @@ func HandleWebhook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Failed to read body", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(resp_b)
 		return
 	}
 
@@ -75,6 +89,7 @@ func HandleWebhook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Failed to parse body", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(resp_b)
 		return
 	}
 	slog.Debug("Got webhook content", "content", webhook_content)
@@ -83,8 +98,18 @@ func HandleWebhook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Failed to parse webhook", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(resp_b)
 		return
 	}
+
+	resp = WebhookResponse{
+		Code: 0,
+		Message: "ok",
+	}
+
+	resp_b, _ = json.Marshal(resp)
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp_b)
 }
 
 func ParseWebhook(body WebhookT) (err error) {
