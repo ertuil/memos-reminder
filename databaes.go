@@ -38,10 +38,10 @@ func LoadTimers() (timer_list *[]TimerDB, err error) {
 			if timer.Diff_sec == 0 {
 				continue
 			}
-		
+
 			diff_sec := int(currentTs.Sub(timer.NextTs).Seconds())
-			move_times := diff_sec / timer.Diff_sec + 1
-			timer.NextTs = timer.NextTs.Add(time.Duration(move_times * timer.Diff_sec) * time.Second)
+			move_times := diff_sec/timer.Diff_sec + 1
+			timer.NextTs = timer.NextTs.Add(time.Duration(move_times*timer.Diff_sec) * time.Second)
 			if move_times > 0 {
 				db.Save(timer)
 				(*timer_list)[idx] = timer

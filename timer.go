@@ -9,7 +9,7 @@ import (
 
 var (
 	timer_list_lock sync.RWMutex
-	timer_list *[]TimerDB = new([]TimerDB)
+	timer_list      *[]TimerDB = new([]TimerDB)
 )
 
 const (
@@ -46,7 +46,7 @@ func TimerServe(ctx context.Context) (err error) {
 		case <-ticker.C:
 			// 每5秒中从chan t.C 中读取一次
 			go handleTimers(ctx)
-		case <- check_timer.C:
+		case <-check_timer.C:
 			go handleCheck(ctx)
 		}
 	}
@@ -81,7 +81,7 @@ func handleActivateTimer(ctx context.Context, timer TimerDB) {
 
 	go SendSMTP(timer.User, timer.MemoId, timer.NextTs, timer.Content)
 
-	if time.Duration(timer.Diff_sec) * time.Second <= PERIOD {
+	if time.Duration(timer.Diff_sec)*time.Second <= PERIOD {
 		slog.Debug("Delete Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 		db.Delete(&timer)
 	} else {

@@ -22,7 +22,7 @@ type Conf struct {
 type SMTP struct {
 	Enabled  bool   `yaml:"enabled"`
 	Host     string `yaml:"host"`
-	Port     string    `yaml:"port"`
+	Port     string `yaml:"port"`
 	From     string `yaml:"from"`
 	Password string `yaml:"password"`
 	TLS      bool   `yaml:"tls"`

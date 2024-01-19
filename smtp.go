@@ -42,10 +42,10 @@ func SendSMTP(UID int, MID int, ts time.Time, Content string) (err error) {
 	defer conn.Close()
 
 	client, err := smtp.NewClient(conn, Config.Smtp.Host)
-    if err != nil {
+	if err != nil {
 		slog.Error("Failed to create smtp client", "error", err)
 		return err
-    }
+	}
 	defer client.Close()
 
 	if Config.Smtp.STARTTLS {
@@ -53,34 +53,34 @@ func SendSMTP(UID int, MID int, ts time.Time, Content string) (err error) {
 	}
 
 	// Authentication
-    auth := smtp.PlainAuth("", Config.Smtp.From, Config.Smtp.Password, Config.Smtp.Host)
+	auth := smtp.PlainAuth("", Config.Smtp.From, Config.Smtp.Password, Config.Smtp.Host)
 	if err = client.Auth(auth); err != nil {
 		slog.Error("Failed to auth smtp client", "error", err)
 		return err
 	}
 
 	// Send to&from
-    // To && From
-    if err = client.Mail(Config.Smtp.From); err != nil {
+	// To && From
+	if err = client.Mail(Config.Smtp.From); err != nil {
 		slog.Error("Failed to send FROM", "error", err, "from", Config.Smtp.From)
 		return err
-    }
+	}
 
-    if err = client.Rcpt(to_address); err != nil {
+	if err = client.Rcpt(to_address); err != nil {
 		slog.Error("Failed to send FROM", "error", err, "to", to_address)
 		return err
-    }
+	}
 
 	// Send body
-    // Data
-    w, err := client.Data()
-    if err != nil {
+	// Data
+	w, err := client.Data()
+	if err != nil {
 		slog.Error("Failed to send DATA", "error", err)
 		return err
-    }
+	}
 
 	subject := "Memos 定时提醒" + " - " + Content
-	body := "Memos 定时提醒" +"\r\n时间：" + ts.Format("2006-01-02 15:04:05") + "\r\n备忘编号：" + strconv.Itoa(MID) + "\r\n内容：" + Content
+	body := "Memos 定时提醒" + "\r\n时间：" + ts.Format("2006-01-02 15:04:05") + "\r\n备忘编号：" + strconv.Itoa(MID) + "\r\n内容：" + Content
 	from_content := mail.Address{Name: "Memo Reminders", Address: Config.Smtp.From}
 	to_content := mail.Address{Name: "", Address: to_address}
 
@@ -93,23 +93,23 @@ func SendSMTP(UID int, MID int, ts time.Time, Content string) (err error) {
 
 	// Setup message
 	message := ""
-	for k,v := range headers {
+	for k, v := range headers {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + body
 	slog.Info("Send email", "from", Config.Smtp.From, "to", to_address, "subject", subject, "server", Config.Smtp.Host, "msg", message)
 
 	_, err = w.Write([]byte(message))
-    if err != nil {
+	if err != nil {
 		slog.Error("Failed to write DATA", "error", err)
-    }
+	}
 	w.Close()
-    return nil
+	return nil
 }
 
 func MergeSlice(s1 []string, s2 []string) []string {
-    slice := make([]string, len(s1)+len(s2))
-    copy(slice, s1)
-    copy(slice[len(s1):], s2)
-    return slice
+	slice := make([]string, len(s1)+len(s2))
+	copy(slice, s1)
+	copy(slice[len(s1):], s2)
+	return slice
 }
