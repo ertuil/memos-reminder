@@ -1,0 +1,12 @@
+listen: "0.0.0.0:8880"
+smtp:
+  enabled: true
+  host: "smtp.example.com"
+  port: "465"
+  from: "from@example.com"
+  password: "password"
+  tls: true
+
+users:
+  - uid: 1
+    email: "to@example.user"
