@@ -10,3 +10,4 @@ smtp:
 users:
   - uid: 1
     email: "to@example.user"
+    ics_pw: "ics_file_password"

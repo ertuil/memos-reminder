@@ -45,6 +45,7 @@ func HTTPServe(ctx context.Context) {
 	}
 
 	http.HandleFunc("/reminder/webhook", HandleWebhook)
+	http.HandleFunc("/reminder/cal", HandleCal)
 	slog.Info("HTTP Server start", "listen", Config.Listen)
 
 	defer srv.Shutdown(ctx)
@@ -262,4 +263,45 @@ func HandleDeletedMemo(body WebhookT) (err error) {
 	LoadTimerFromDB()
 
 	return nil
+}
+
+func HandleCal(w http.ResponseWriter, r *http.Request) {
+	uurl := r.URL
+	uid_str := uurl.Query().Get("uid")
+	pw_str := uurl.Query().Get("pw")
+
+	if uid_str == "" || pw_str == "" {
+		slog.Error("Invalid calender request", "uid", uid_str, "pw", pw_str)
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	uid, err := strconv.Atoi(uid_str)
+	if err != nil {
+		slog.Error("Invalid calender request", "uid", uid_str, "pw", pw_str)
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	auth := false
+	auth_uid := 0
+	for _, user := range Config.Users {
+		if user.UID == uid && user.ICS_PW == pw_str {
+			auth = true
+			auth_uid = uid
+			break
+		}
+	}
+
+	if !auth {
+		slog.Error("Invalid calender request", "uid", uid_str, "pw", pw_str)
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	cal_str := ParseICS(auth_uid)
+	w.Header().Set("Content-Type", "text/calendar")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(cal_str))
+	return
 }

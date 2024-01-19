@@ -33,6 +33,7 @@ type SMTP struct {
 type USER struct {
 	UID   int    `yaml:"uid"`
 	Email string `yaml:"email"`
+	ICS_PW string `yaml:"ics_pw"`
 }
 
 func LoadConfig(filename string) (err error) {
