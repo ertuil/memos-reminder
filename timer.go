@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"sync"
 	"time"
+
+	"github.com/Andrew-M-C/go.timeconv"
 )
 
 var (
@@ -86,7 +88,18 @@ func handleActivateTimer(ctx context.Context, timer TimerDB) {
 		db.Delete(&timer)
 	} else {
 		slog.Debug("Reset Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
-		timer.NextTs = timer.NextTs.Add(time.Duration(timer.Diff_sec) * time.Second)
+		if timer.Diff_sec >= 2592000 &&  timer.Diff_sec < 31536000 && timer.Diff_sec % 2592000 == 0 {
+			// 整月份调整
+			c := timer.Diff_sec / 2592000
+			timer.NextTs = timeconv.AddDate(timer.NextTs, 0, c, 0)
+		} else if timer.Diff_sec >= 31536000 && timer.Diff_sec % 31536000 == 0 {
+			// 整年调整
+			c := timer.Diff_sec / 31536000
+			timer.NextTs = timeconv.AddDate(timer.NextTs, c, 0, 0)
+		} else {
+			// 默认按秒调整
+			timer.NextTs = timer.NextTs.Add(time.Duration(timer.Diff_sec) * time.Second)
+		}
 		db.Save(&timer)
 	}
 }

@@ -3,6 +3,7 @@ module github.com/ertuil/memos-reminder
 go 1.21.5
 
 require (
+	github.com/Andrew-M-C/go.timeconv v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/glebarez/sqlite v1.10.0 // indirect
