@@ -33,6 +33,7 @@ func InitDatabase() (err error) {
 func LoadTimers() (timer_list *[]TimerDB, err error) {
 	db.Find(&timer_list)
 	currentTs := time.Now()
+
 	for idx, timer := range *timer_list {
 		if timer.NextTs.Before(currentTs) {
 			if timer.Diff_sec == 0 {
@@ -47,7 +48,9 @@ func LoadTimers() (timer_list *[]TimerDB, err error) {
 				(*timer_list)[idx] = timer
 			}
 		}
-		slog.Info("load timer from database", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
+		slog.Debug("load timer from database", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 	}
+
+	slog.Info("load timer from database", "count", len(*timer_list))
 	return
 }

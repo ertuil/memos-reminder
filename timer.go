@@ -84,10 +84,9 @@ func handleActivateTimer(ctx context.Context, timer TimerDB) {
 	go SendSMTP(timer.User, timer.MemoId, timer.NextTs, timer.Content)
 
 	if time.Duration(timer.Diff_sec)*time.Second <= PERIOD {
-		slog.Debug("Delete Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 		db.Delete(&timer)
+		slog.Info("Delete Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 	} else {
-		slog.Debug("Reset Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 		if timer.Diff_sec >= 2592000 &&  timer.Diff_sec < 31536000 && timer.Diff_sec % 2592000 == 0 {
 			// 整月份调整
 			c := timer.Diff_sec / 2592000
@@ -101,6 +100,7 @@ func handleActivateTimer(ctx context.Context, timer TimerDB) {
 			timer.NextTs = timer.NextTs.Add(time.Duration(timer.Diff_sec) * time.Second)
 		}
 		db.Save(&timer)
+		slog.Info("Reset Timer", "user", timer.User, "memo_id", timer.MemoId, "content", timer.Content, "next_ts", timer.NextTs, "rotate", timer.Diff_sec)
 	}
 }
 
