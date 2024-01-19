@@ -93,7 +93,7 @@ func HandleWebhook(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp_b)
 		return
 	}
-	slog.Debug("Got webhook content", "content", webhook_content)
+	slog.Debug("Got webhook content", "content", webhook_content, "activityType", webhook_content.ActivityType)
 
 	activityType := webhook_content.ActivityType
 
